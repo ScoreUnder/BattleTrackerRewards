@@ -25,24 +25,31 @@ public class PlayerKillEvent {
 	public int currencyChange;
 	public int currencyDefault;
 	public int numberWinner;
+	@SuppressWarnings("rawtypes")
 	public List winnerList; 
 	public String[] winnerArray;
 	public int winnerArrayLength;
+	public int shutdownBonus;
 	
+	
+	//Takes "winner" list and in succession updates each player on the lists Currency
 	public void updateTeam(int edModifier){
 		winnerList = winner.getMembers();
 		winnerArray = (String[]) winnerList.toArray();
 		winnerArrayLength = winnerArray.length;
 		int i = 0;
 		while ( i <= winnerArrayLength){
-			winnerCurrency = BattleTrackerConfig.getCurrency(winnerArray[i]) + ( currencyChange * edModifier );
-			winnerCurrency = winnerCurrency + currencyDefault;
+			winnerCurrency = BattleTrackerConfig.getCurrency(winnerArray[i]); // edModifier = elo difference modifier
+			winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * edModifier ) + shutdownBonus;
 			BattleTrackerConfig.updatePlayer(winnerArray[i], winnerCurrency);
 		}
 	}
 	
+	
+	
 	public void onWinStatChangeEvent(WinStatChangeEvent wsce){
 		
+		//Setting variables
 		winner = wsce.getWinner();
 		winnerName = winner.getName();
 		winnerRating = winner.getRating();
@@ -51,20 +58,36 @@ public class PlayerKillEvent {
 		loserName = loser.getName();
 		loserRating =loser.getRating();
 		loserGames = loser.getWins() + loser.getLosses();
+		loserStreak = loser.getStreak();
 		currencyChange = BTRConstants.currencyChange;
 		currencyDefault = BTRConstants.defaultCurrencyValue;
 		numberWinner = winner.getCount();
 		
+		
+		//Loser killing spree is used to calculate any bonus currency
+		if(loserStreak >= BTRConstants.killingSpree){
+			shutdownBonus = ( loserStreak + 1 ) - BTRConstants.killingSpree;
+			if(shutdownBonus > BTRConstants.shutdownMax){
+				shutdownBonus = BTRConstants.shutdownMax * BTRConstants.shutdownMultiplier;
+			}else if(shutdownBonus < BTRConstants.shutdownMax){
+				shutdownBonus = shutdownBonus * BTRConstants.shutdownMultiplier;
+			}
+		}else{
+			shutdownBonus = 0;
+		}
+		
+		
 		if(numberWinner == 1){
 		
+			
 			if(loserGames <= 10){
 				
 				winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
-				winnerCurrency = winnerCurrency + currencyDefault;
+				winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
 				BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 		
 			}else if(loserGames > 10){
-			
+				
 				if( winnerRating > loserRating ){
 				
 					eloDifference = winnerRating - loserRating;
@@ -72,22 +95,22 @@ public class PlayerKillEvent {
 					winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
 				
 					if(eloDifference < 1){
-						winnerCurrency = winnerCurrency + currencyDefault;
+						winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 1 && eloDifference < 2){
-						winnerCurrency = winnerCurrency + currencyDefault - currencyChange;
+						winnerCurrency = winnerCurrency + currencyDefault - currencyChange + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 2 && eloDifference < 3){
-						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 2 );
+						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 2 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 3 && eloDifference < 4){
-						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 3 );
+						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 3 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 4 && eloDifference < 5){
-						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 4 );
+						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 4 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 5){
-						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 5 );
+						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 5 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}
 			
@@ -98,22 +121,22 @@ public class PlayerKillEvent {
 					winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
 				
 					if(eloDifference < 1){
-						winnerCurrency = winnerCurrency + currencyDefault;
+						winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 1 && eloDifference < 2){
-						winnerCurrency = winnerCurrency + currencyDefault + currencyChange;
+						winnerCurrency = winnerCurrency + currencyDefault + currencyChange + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 2 && eloDifference < 3){
-						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 2 );
+						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 2 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 3 && eloDifference < 4){
-						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 3 );
+						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 3 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 4 && eloDifference < 5){
-						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 4 );
+						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 4 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 5){
-						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 5 );
+						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 5 ) + shutdownBonus;
 						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
 					}
 				}

@@ -7,7 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import com.alk.executors.CustomCommandExecutor;
 
-public class HonourCheck extends CustomCommandExecutor {
+public class CurrencyCheck extends CustomCommandExecutor {
 	
 	public String senderName;
 	public String otherPlayer;
@@ -30,9 +30,15 @@ public class HonourCheck extends CustomCommandExecutor {
 		if(Args.length == 1){
 			otherPlayer = Args[0];
 			currencyValue = BattleTrackerConfig.getCurrency(otherPlayer);
-			sender.sendMessage(ChatColor.DARK_RED + otherPlayer + " has " + currencyValue + BTRConstants.currencyName );
+			
+			if(otherPlayer.isEmpty()){
+				sender.sendMessage(ChatColor.DARK_RED + "The player you searched for hasn't joined the server");
+			}else{
+				sender.sendMessage(ChatColor.DARK_RED + otherPlayer + " has " + currencyValue + " " + BTRConstants.currencyName );
+			}
 		}
 	}
-	
-}
 
+	
+
+}
