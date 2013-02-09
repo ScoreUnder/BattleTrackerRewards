@@ -1,7 +1,7 @@
 package mc.stuu.battletrackerrewards.listeners;
 
 import mc.stuu.battletrackerrewards.BTRConstants;
-import mc.stuu.battletrackerrewards.BattleTrackerConfig;
+import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -17,10 +17,10 @@ public class PlayerListener implements Listener {
 		player = pje.getPlayer();
 		if(!player.hasPlayedBefore()){
 			playerName = player.getName();
-			BattleTrackerConfig.addPlayer(playerName);
+			BTRPlayerConfig.addPlayer(playerName);
 		}else if(BTRConstants.currencyOnJoin == "yes"){
 			playerName = player.getName();
-			playerCurrency = BattleTrackerConfig.getCurrency(playerName);
+			playerCurrency = BTRPlayerConfig.getCurrency(playerName);
 			player.sendMessage("You have " + playerCurrency + " " + BTRConstants.currencyName);
 		}
 	}

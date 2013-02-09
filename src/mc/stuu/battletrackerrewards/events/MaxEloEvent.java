@@ -3,7 +3,7 @@ package mc.stuu.battletrackerrewards.events;
 import mc.alk.tracker.events.MaxRatingChangeEvent;
 import mc.alk.tracker.objects.Stat;
 import mc.stuu.battletrackerrewards.BTRConstants;
-import mc.stuu.battletrackerrewards.BattleTrackerConfig;
+import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
 
 public class MaxEloEvent {
 	
@@ -24,6 +24,6 @@ public class MaxEloEvent {
 		double eloMultiplier = increasedElo / 100;
 		double battlePoints = eloMultiplier * eloCurrencyMultiplier;
 		//Update player
-		BattleTrackerConfig.updatePlayer(maxEloPlayer, battlePoints);
+		BTRPlayerConfig.updatePlayer(maxEloPlayer, battlePoints);
 	}
 }

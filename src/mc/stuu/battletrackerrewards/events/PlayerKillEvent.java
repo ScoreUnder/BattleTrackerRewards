@@ -3,7 +3,7 @@ package mc.stuu.battletrackerrewards.events;
 import java.util.List;
 
 import mc.stuu.battletrackerrewards.BTRConstants;
-import mc.stuu.battletrackerrewards.BattleTrackerConfig;
+import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
 import mc.alk.tracker.events.WinStatChangeEvent;
 import mc.alk.tracker.objects.Stat;
 
@@ -39,9 +39,9 @@ public class PlayerKillEvent {
 		winnerArrayLength = winnerArray.length;
 		int i = 0;
 		while ( i <= winnerArrayLength){
-			winnerCurrency = BattleTrackerConfig.getCurrency(winnerArray[i]); // edModifier = elo difference modifier
+			winnerCurrency = BTRPlayerConfig.getCurrency(winnerArray[i]); // edModifier = elo difference modifier
 			winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * edModifier ) + shutdownBonus;
-			BattleTrackerConfig.updatePlayer(winnerArray[i], winnerCurrency);
+			BTRPlayerConfig.updatePlayer(winnerArray[i], winnerCurrency);
 		}
 	}
 	
@@ -82,9 +82,9 @@ public class PlayerKillEvent {
 			
 			if(loserGames <= 10){
 				
-				winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
+				winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
 				winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-				BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+				BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 		
 			}else if(loserGames > 10){
 				
@@ -92,52 +92,52 @@ public class PlayerKillEvent {
 				
 					eloDifference = winnerRating - loserRating;
 					eloDifference = eloDifference / 100;
-					winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
+					winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
 				
 					if(eloDifference < 1){
 						winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 1 && eloDifference < 2){
 						winnerCurrency = winnerCurrency + currencyDefault - currencyChange + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 2 && eloDifference < 3){
 						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 2 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 3 && eloDifference < 4){
 						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 3 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 4 && eloDifference < 5){
 						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 4 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 5){
 						winnerCurrency = winnerCurrency + currencyDefault - ( currencyChange * 5 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}
 			
 				}else if( loserRating > winnerRating ){
 				
 					eloDifference = loserRating - winnerRating;
 					eloDifference = eloDifference / 100;
-					winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
+					winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
 				
 					if(eloDifference < 1){
 						winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 1 && eloDifference < 2){
 						winnerCurrency = winnerCurrency + currencyDefault + currencyChange + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 2 && eloDifference < 3){
 						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 2 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 3 && eloDifference < 4){
 						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 3 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 4 && eloDifference < 5){
 						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 4 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}else if( eloDifference > 5){
 						winnerCurrency = winnerCurrency + currencyDefault + ( currencyChange * 5 ) + shutdownBonus;
-						BattleTrackerConfig.updatePlayer(winnerName, winnerCurrency);
+						BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
 					}
 				}
 			}
@@ -178,7 +178,7 @@ public class PlayerKillEvent {
 				
 					eloDifference = loserRating - winnerRating;
 					eloDifference = eloDifference / 100;
-					winnerCurrency = BattleTrackerConfig.getCurrency(winnerName);
+					winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
 					updateTeam(0);
 					
 					}else if( eloDifference > 1 && eloDifference < 2){

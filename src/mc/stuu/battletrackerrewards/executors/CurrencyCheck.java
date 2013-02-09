@@ -1,7 +1,7 @@
 package mc.stuu.battletrackerrewards.executors;
 
 import mc.stuu.battletrackerrewards.BTRConstants;
-import mc.stuu.battletrackerrewards.BattleTrackerConfig;
+import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class CurrencyCheck extends CustomCommandExecutor {
 	@MCCommand(cmds={"honour"})
 	public void honourCheck(CommandSender sender) {
 		senderName = sender.getName();
-		currencyValue = BattleTrackerConfig.getCurrency(senderName);
+		currencyValue = BTRPlayerConfig.getCurrency(senderName);
 		sender.sendMessage(ChatColor.DARK_RED + "You have" + currencyValue + BTRConstants.currencyName );
 	}
 	
@@ -29,7 +29,7 @@ public class CurrencyCheck extends CustomCommandExecutor {
 		
 		if(Args.length == 1){
 			otherPlayer = Args[0];
-			currencyValue = BattleTrackerConfig.getCurrency(otherPlayer);
+			currencyValue = BTRPlayerConfig.getCurrency(otherPlayer);
 			
 			if(otherPlayer.isEmpty()){
 				sender.sendMessage(ChatColor.DARK_RED + "The player you searched for hasn't joined the server");
