@@ -20,10 +20,7 @@ public class BattleTrackerRewards extends JavaPlugin{
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new PlayerListener(), this);
 	}
-		
-	
-	
-	
+
 	public void onDisable(){
 		getLogger().info("BattleTrackerRewards has been disabled.");
 		BTRPlayerConfig.saveConfig();
@@ -32,13 +29,5 @@ public class BattleTrackerRewards extends JavaPlugin{
 	
 	public static BattleTrackerRewards findPath(){
 		return plugin;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 }

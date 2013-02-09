@@ -38,7 +38,4 @@ public class CurrencyCheck extends CustomCommandExecutor {
 			}
 		}
 	}
-
-	
-
 }

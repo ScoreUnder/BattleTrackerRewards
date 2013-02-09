@@ -43,7 +43,5 @@ public class CurrencyChange extends CustomCommandExecutor{
 			sender.sendMessage(ChatColor.RED + "Invalid arguments.");
 			sender.sendMessage(ChatColor.RED + "Usage: /sethonour <player> <amount>");
 		}
-		
 	}
-	
 }
