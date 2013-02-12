@@ -1,0 +1,17 @@
+name: BattleTrackerRewards
+main: mc.stuu.battletrackerrewards.BattleTrackerRewards
+version: 1.0
+description: An extension of BattleTracker which gives currency on kills. 
+authors: 
+ - Stuu
+commands:
+  honour:
+    description: Commands for BattleTrackerRewards Plugin
+    usage: honour <(player)|help> 
+      
+  honouradmin:
+    description: Admin commands for BattleTrackerRewards Plugin
+    usage: honouradmin <configset|configfind|set|add|remove|jmessage> [arguments]
+    permission: tracker.admin
+    permission-message: You don't have permission.
+   
