@@ -1,48 +1,38 @@
 package mc.stuu.battletrackerrewards.config;
 
-import java.io.File;
-
 import mc.stuu.battletrackerrewards.BattleTrackerRewards;
-
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
+
+import java.io.File;
 
 
 public class BTRConfig {
-	static File cfile;
-	public static YamlConfiguration config = new YamlConfiguration();
-	
-	public static void loadPluginConfig(BattleTrackerRewards plugin){
-		File cfile = new File(plugin.getDataFolder() + "/config.yml");
-		try{
-			config.load(cfile);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+	public static FileConfiguration config;
+
+	public static void loadPluginConfig(Plugin plugin) {
+		plugin.reloadConfig();
+		config = plugin.getConfig();
 	}
-	
-	public static void savePluginConfig(BattleTrackerRewards plugin){
-		
-		try{
-			config.save(cfile);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+
+	public static void savePluginConfig(Plugin plugin) {
+		plugin.saveConfig();
 	}
-	
-	public static String getConfigString(String path){
+
+	public static String getConfigString(String path) {
 		return config.getString("Values." + path);
-	}	
-	
-	public static int getConfigInt(String path){
+	}
+
+	public static int getConfigInt(String path) {
 		return config.getInt("Values." + path);
 	}
-	
-	public static void setConfigString(String path, String string){
-		config.set("Values." + path, string );
-	}
-	public static void setConfigInt(String path, int i){
-		config.set("Values." + path, i );
-	}
-	
 
+	public static void setConfigString(String path, String string) {
+		config.set("Values." + path, string);
+	}
+
+	public static void setConfigInt(String path, int i) {
+		config.set("Values." + path, i);
+	}
 }

@@ -4,7 +4,7 @@ Values:
   eloCurrencyMultiplier: 10
   defaultElo: 1250
   currencyChange: 1
-  currencyName: Honour
+  currencyName: "{0} Honour"
   killingSpree: 5
   shutdownMultiplier: 1
   shutdownMax: 5

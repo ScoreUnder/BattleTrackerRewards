@@ -1,64 +1,55 @@
 package mc.stuu.battletrackerrewards.config;
 
-import java.io.File;
-import java.io.IOException;
-
 import mc.stuu.battletrackerrewards.BattleTrackerRewards;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-public class BTRPlayerConfig extends BattleTrackerRewards{
-	
-	public static YamlConfiguration config = new YamlConfiguration();
-	
-	public static void createPlayerFile(String player){
-		File f = new File(plugin.getDataFolder() + "/" + player + ".yml");
-		if(!f.exists()){
-			try {
-				f.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+
+public class BTRPlayerConfig {
+	private static Map<String, BTRPlayerConfig> configs = new HashMap<String, BTRPlayerConfig>();
+	private final YamlConfiguration config;
+	private final File configFile;
+	private final String player;
+
+	private BTRPlayerConfig(String player, File folder) {
+		if (player == null) throw new IllegalArgumentException("No player name passed to BTRPlayerConfig");
+		this.player = player;
+		this.configFile = new File(folder, player + ".yml");
+		this.config = YamlConfiguration.loadConfiguration(configFile);
 	}
-	
-	public static void loadConfig(String player){
-		File cfile = new File(plugin.getDataFolder() + "/" + player + ".yml");
-		try{
-			config.load(cfile);
-		}catch(Exception e){
+
+	public static BTRPlayerConfig getConfigFor(String player) {
+		BTRPlayerConfig config = configs.get(player);
+		if (config == null) {
+			config = new BTRPlayerConfig(player, BattleTrackerRewards.getInstance().getDataFolder());
+			configs.put(player, config);
+		}
+		return config;
+	}
+
+	public void save() {
+		try {
+			config.save(configFile);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void saveConfig(String player){
-		File cfile = new File(plugin.getDataFolder() + "/" + player + ".yml");
-		try{
-			config.save(cfile);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+
+	public void unload() {
+		save();
+		configs.remove(player);
 	}
-	
-	
-	public static void updatePlayer(String updatedPlayer, double newCurrency){
-		File f = new File(plugin.getDataFolder() + "/" + updatedPlayer + ".yml");
-		if(f.exists()){
-			config.set("Honour", newCurrency);
-		}
+
+	public void setCurrency(long newCurrency) {
+		config.set("Honour", newCurrency);
 	}
-	
-	
-	public static int getCurrency(String player){
-		int i = 00;
-		File f = new File(plugin.getDataFolder() + "/" + player + ".yml");
-		if(f.exists()){
-			return config.getInt("Honour");
-			
-		}
-	return i;
-	}	
-	
+
+	public long getCurrency() {
+		return config.getLong("Honour", 0L);
+	}
 }
 	
 

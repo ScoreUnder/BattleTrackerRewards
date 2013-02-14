@@ -1,196 +1,73 @@
 package mc.stuu.battletrackerrewards.events;
 
-import java.util.List;
-
-import mc.stuu.battletrackerrewards.BTRConstants;
-import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
 import mc.alk.tracker.events.WinStatChangeEvent;
 import mc.alk.tracker.objects.Stat;
+import mc.stuu.battletrackerrewards.config.BTRPlayerConfig;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
+import static mc.stuu.battletrackerrewards.BTRConfigValues.*;
 
+public class PlayerKillEvent implements Listener {
 
-public class PlayerKillEvent {
+	//Takes "winner" list and in succession updates each player on the lists Currency
+	private void updateTeam(Stat winner, long edModifier, long shutdownBonus) {
+		long incAmt = defaultCurrencyValue + currencyChange * edModifier + shutdownBonus;
+		for (String winnerName : winner.getMembers()) {
+			BTRPlayerConfig config = BTRPlayerConfig.getConfigFor(winnerName);
+			long winnerCurrency = config.getCurrency(); // edModifier = elo difference modifier
+			winnerCurrency += incAmt;
+			config.setCurrency(winnerCurrency);
+		}
+	}
 
-    public Stat winner;
-    public Stat loser;
-    public String winnerName;
-    public String loserName;
-    public int loserRating;
-    public int winnerRating;
-    public int winnerStreak;
-    public int loserStreak;
-    public int loserGames;
-    public int winnerCurrency;
-    public float eloDifference;
-    public int currencyChange;
-    public int currencyDefault;
-    public int numberWinner;@SuppressWarnings("rawtypes")
-    public List winnerList;
-    public String[] winnerArray;
-    public int winnerArrayLength;
-    public int shutdownBonus;
+	@EventHandler
+	public void onWinStatChangeEvent(WinStatChangeEvent wsce) {
 
+		//Setting variables
+		Stat winner = wsce.getWinner();
+		String winnerName = winner.getName();
+		int winnerRating = winner.getRating();
+		int winnerStreak = winner.getStreak();
+		Stat loser = wsce.getLoser();
+		String loserName = loser.getName();
+		int loserRating = loser.getRating();
+		int loserGames = loser.getWins() + loser.getLosses();
+		int loserStreak = loser.getStreak();
+		int numberWinner = winner.getCount();
 
-    //Takes "winner" list and in succession updates each player on the lists Currency
-    public void updateTeam(int edModifier) {
-        winnerList = winner.getMembers();
-        winnerArray = (String[]) winnerList.toArray();
-        winnerArrayLength = winnerArray.length;
-        int i = 0;
-        while (i <= winnerArrayLength) {
-            winnerCurrency = BTRPlayerConfig.getCurrency(winnerArray[i]); // edModifier = elo difference modifier
-            winnerCurrency = winnerCurrency + currencyDefault + (currencyChange * edModifier) + shutdownBonus;
-            BTRPlayerConfig.updatePlayer(winnerArray[i], winnerCurrency);
-        }
-    }
+		//Loser killing spree is used to calculate any bonus currency
+		int shutdownBonus;
+		if (loserStreak >= killingSpree) {
+			shutdownBonus = shutdownMultiplier * Math.min((loserStreak + 1) - killingSpree, shutdownMax);
+		} else {
+			shutdownBonus = 0;
+		}
 
+		if (numberWinner == 1) {
+			if (loserGames <= 10) {
+				BTRPlayerConfig config = BTRPlayerConfig.getConfigFor(winnerName);
+				long winnerCurrency = config.getCurrency();
+				winnerCurrency += defaultCurrencyValue + shutdownBonus;
+				config.setCurrency(winnerCurrency);
+			} else {
+				long eloDifference = getEloDifference(loserRating, winnerRating);
+				BTRPlayerConfig config = BTRPlayerConfig.getConfigFor(winnerName);
+				long winnerCurrency = config.getCurrency() + defaultCurrencyValue + currencyChange * eloDifference + shutdownBonus;
+				config.setCurrency(winnerCurrency);
+			}
+		} else if (numberWinner > 1) {
+			if (loserGames <= 10) {
+				updateTeam(winner, 0, shutdownBonus);
+			}
+		} else if (loserGames > 10) {
+			int eloDifference = getEloDifference(loserRating, winnerRating);
+			updateTeam(winner, eloDifference, shutdownBonus);
+		}
+	}
 
-
-    public void onWinStatChangeEvent(WinStatChangeEvent wsce) {
-
-        //Setting variables
-        winner = wsce.getWinner();
-        winnerName = winner.getName();
-        winnerRating = winner.getRating();
-        winnerStreak = winner.getStreak();
-        loser = wsce.getLoser();
-        loserName = loser.getName();
-        loserRating = loser.getRating();
-        loserGames = loser.getWins() + loser.getLosses();
-        loserStreak = loser.getStreak();
-        currencyChange = BTRConstants.currencyChange;
-        currencyDefault = BTRConstants.defaultCurrencyValue;
-        numberWinner = winner.getCount();
-
-
-        //Loser killing spree is used to calculate any bonus currency
-        if (loserStreak >= BTRConstants.killingSpree) {
-            shutdownBonus = (loserStreak + 1) - BTRConstants.killingSpree;
-            if (shutdownBonus > BTRConstants.shutdownMax) {
-                shutdownBonus = BTRConstants.shutdownMax * BTRConstants.shutdownMultiplier;
-            } else if (shutdownBonus < BTRConstants.shutdownMax) {
-                shutdownBonus = shutdownBonus * BTRConstants.shutdownMultiplier;
-            }
-        } else {
-            shutdownBonus = 0;
-        }
-
-
-        if (numberWinner == 1) {
-
-
-            if (loserGames <= 10) {
-
-                winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
-                winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-                BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-
-            } else if (loserGames > 10) {
-
-                if (winnerRating > loserRating) {
-
-                    eloDifference = winnerRating - loserRating;
-                    eloDifference = eloDifference / 100;
-                    winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
-
-                    if (eloDifference < 1) {
-                        winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 1 && eloDifference < 2) {
-                        winnerCurrency = winnerCurrency + currencyDefault - currencyChange + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 2 && eloDifference < 3) {
-                        winnerCurrency = winnerCurrency + currencyDefault - (currencyChange * 2) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 3 && eloDifference < 4) {
-                        winnerCurrency = winnerCurrency + currencyDefault - (currencyChange * 3) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 4 && eloDifference < 5) {
-                        winnerCurrency = winnerCurrency + currencyDefault - (currencyChange * 4) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 5) {
-                        winnerCurrency = winnerCurrency + currencyDefault - (currencyChange * 5) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    }
-
-                } else if (loserRating > winnerRating) {
-
-                    eloDifference = loserRating - winnerRating;
-                    eloDifference = eloDifference / 100;
-                    winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
-
-                    if (eloDifference < 1) {
-                        winnerCurrency = winnerCurrency + currencyDefault + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 1 && eloDifference < 2) {
-                        winnerCurrency = winnerCurrency + currencyDefault + currencyChange + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 2 && eloDifference < 3) {
-                        winnerCurrency = winnerCurrency + currencyDefault + (currencyChange * 2) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 3 && eloDifference < 4) {
-                        winnerCurrency = winnerCurrency + currencyDefault + (currencyChange * 3) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 4 && eloDifference < 5) {
-                        winnerCurrency = winnerCurrency + currencyDefault + (currencyChange * 4) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    } else if (eloDifference > 5) {
-                        winnerCurrency = winnerCurrency + currencyDefault + (currencyChange * 5) + shutdownBonus;
-                        BTRPlayerConfig.updatePlayer(winnerName, winnerCurrency);
-                    }
-                }
-            }
-        } else if (numberWinner > 1) {
-            winnerList = winner.getMembers();
-            winnerArray = (String[]) winnerList.toArray();
-            winnerArrayLength = winnerArray.length;
-
-            if (loserGames <= 10) {
-                updateTeam(0);
-            }
-
-
-
-        } else if (loserGames > 10) {
-
-            if (winnerRating > loserRating) {
-
-                eloDifference = winnerRating - loserRating;
-                eloDifference = eloDifference / 100;
-
-
-                if (eloDifference < 1) {
-                    updateTeam(0);
-                } else if (eloDifference > 1 && eloDifference < 2) {
-                    updateTeam(-1);
-                } else if (eloDifference > 2 && eloDifference < 3) {
-                    updateTeam(-2);
-                } else if (eloDifference > 3 && eloDifference < 4) {
-                    updateTeam(-3);
-                } else if (eloDifference > 4 && eloDifference < 5) {
-                    updateTeam(-4);
-                } else if (eloDifference > 5) {
-                    updateTeam(-5);
-                }
-
-            } else if (loserRating > winnerRating) {
-
-                eloDifference = loserRating - winnerRating;
-                eloDifference = eloDifference / 100;
-                winnerCurrency = BTRPlayerConfig.getCurrency(winnerName);
-                updateTeam(0);
-
-            } else if (eloDifference > 1 && eloDifference < 2) {
-                updateTeam(1);
-            } else if (eloDifference > 2 && eloDifference < 3) {
-                updateTeam(2);
-            } else if (eloDifference > 3 && eloDifference < 4) {
-                updateTeam(3);
-            } else if (eloDifference > 4 && eloDifference < 5) {
-                updateTeam(4);
-            } else if (eloDifference > 5) {
-                updateTeam(5);
-            }
-        }
-    }
+	private int getEloDifference(int loser, int winner) {
+		int eloDifference = loser - winner;
+		return Math.min(5, Math.max(-5, eloDifference / 100));
+	}
 }
